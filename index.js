@@ -1,6 +1,7 @@
 require('dotenv').config();
 const dns = require('node:dns');
-const util = require('util')
+const url = require('node:url');
+const util = require('util');
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -47,17 +48,18 @@ app.get('/api/hello', function(req, res) {
 
 // Post route
 app.post('/api/shorturl', async function (req, res) {
-    const regex = /HTTPS?:\/\//i;
+    //const regex = /HTTPS?:\/\//i;
     let nextKey = await db.list().then(keys => keys.length);
     let url = await req.body.url
     console.log(url)
-    let dnsURL = url.replace(regex, "")
-    console.log(dnsURL)
-    dns.lookup(dnsURL, options, function (err, address) {
+    let urlObject = new URL(url)
+    //let dnsURL = url.replace(regex, "")
+    console.log(`urlObject: ${JSON.stringify(urlObject)}`)
+    dns.lookup(urlObject.hostname, function (err, address) {
       if (err) {
         res.json({error: 'invalid url'})
       } else {
-        console.log(`isValidUrl: ${dnsURL}`)
+        console.log(`isValidUrl: ${url}`)
         db.set(nextKey, url).then(() => {})
         res.json({ original_url : url , short_url : nextKey})
       }  
