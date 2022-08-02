@@ -48,18 +48,16 @@ app.get('/api/hello', function(req, res) {
 
 // Post route
 app.post('/api/shorturl', async function (req, res) {
-    //const regex = /HTTPS?:\/\//i;
     let nextKey = await db.list().then(keys => keys.length);
     let url = await req.body.url
-    console.log(url)
+    //console.log(url)
     let urlObject = new URL(url)
-    //let dnsURL = url.replace(regex, "")
-    console.log(`urlObject: ${JSON.stringify(urlObject)}`)
+    //console.log(`urlObject: ${JSON.stringify(urlObject)}`)
     dns.lookup(urlObject.hostname, function (err, address) {
       if (err) {
         res.json({error: 'invalid url'})
       } else {
-        console.log(`isValidUrl: ${url}`)
+        //console.log(`isValidUrl: ${url}`)
         db.set(nextKey, url).then(() => {})
         res.json({ original_url : url , short_url : nextKey})
       }  
@@ -67,8 +65,9 @@ app.post('/api/shorturl', async function (req, res) {
 })
 
 app.get('/api/shorturl/:shorturl', async function (req, res) {
+  //console.log(`req.params.shorturl: ${req.params.shorturl}`)
   let isValidShortURL = await db.get(req.params.shorturl)
-  console.log(`isValidShortURL: ${isValidShortURL}`)
+  //console.log(`isValidShortURL: ${isValidShortURL}`)
   if (isValidShortURL) {
     res.redirect(isValidShortURL)
   } else {
